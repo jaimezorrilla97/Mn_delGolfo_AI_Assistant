@@ -18,6 +18,7 @@ export class McpManager {
     const transport = new StdioClientTransport({
       command: serverDef.command,
       args: serverDef.args,
+      env: process.env,
     });
 
     const client = new Client({
