@@ -9,7 +9,7 @@ This guide describes how to deploy the GA4-Claude-Connector Telegram bot to Rail
 
 ## Step 1: Create a Railway Project
 1. Go to [Railway](https://railway.app/) and click **New Project**.
-2. Select **Deploy from GitHub repo** and choose your `ga4-claude-connector` repository.
+2. Select **Deploy from GitHub repo** and choose your `Mn_delGolfo_AI_Assistant` repository.
 3. Railway will automatically detect the `Dockerfile` and build your application.
 
 ## Step 2: Configure Environment Variables
