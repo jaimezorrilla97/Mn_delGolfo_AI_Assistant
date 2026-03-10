@@ -1,9 +1,18 @@
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, "..", ".env") });
+// Only try to load .env if it exists (local development)
+try {
+  const envPath = path.join(__dirname, "..", ".env");
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+  }
+} catch (e) {
+  // Ignore in production
+}
 
 export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
