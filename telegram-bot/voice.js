@@ -1,4 +1,5 @@
 import { GROQ_API_KEY } from "./config.js";
+import { logger } from "./logger.js";
 
 const GROQ_WHISPER_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
 
@@ -17,7 +18,7 @@ export async function transcribeVoice(audioBuffer) {
 
   if (!response.ok) {
     const error = await response.text();
-    console.error("[voice] Groq transcription error:", error);
+    logger.error("voice", "Groq transcription error", error);
     return null;
   }
 

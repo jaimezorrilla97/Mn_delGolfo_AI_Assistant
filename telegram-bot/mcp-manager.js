@@ -1,6 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { MCP_SERVERS } from "./config.js";
+import { logger } from "./logger.js";
 
 export class McpManager {
   constructor() {
@@ -28,7 +29,7 @@ export class McpManager {
     const { tools } = await client.listTools();
 
     this.clients.set(serverDef.name, { client, transport, tools, serverDef });
-    console.log(`[mcp] "${serverDef.name}" connected — ${tools.length} tools`);
+    logger.info("mcp", `"${serverDef.name}" connected — ${tools.length} tools`);
   }
 
   getAllTools() {
@@ -56,9 +57,9 @@ export class McpManager {
     for (const [name, { client }] of this.clients) {
       try {
         await client.close();
-        console.log(`[mcp] "${name}" disconnected`);
+        logger.info("mcp", `"${name}" disconnected`);
       } catch (err) {
-        console.error(`[mcp] Error closing "${name}":`, err.message);
+        logger.error("mcp", `Error closing "${name}"`, err.message);
       }
     }
   }

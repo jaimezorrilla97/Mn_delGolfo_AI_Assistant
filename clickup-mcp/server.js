@@ -1,10 +1,5 @@
-import dotenv from "dotenv";
-import path from "path";
 import * as chrono from "chrono-node";
 import { DateTime } from "luxon";
-
-const ROOT_DIR = path.dirname(new URL(import.meta.url).pathname);
-dotenv.config({ path: path.join(ROOT_DIR, ".env") });
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";

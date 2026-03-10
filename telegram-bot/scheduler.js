@@ -1,17 +1,18 @@
 import cron from "node-cron";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import OpenAI from "openai";
 import { DateTime } from "luxon";
-import { OPENROUTER_API_KEY, OPENROUTER_MODEL, ALLOWED_CHAT_IDS } from "./config.js";
+import { logger } from "./logger.js";
+import {
+  OPENROUTER_API_KEY,
+  OPENROUTER_MODEL,
+  ALLOWED_CHAT_IDS,
+  CLICKUP_API_TOKEN,
+  CLICKUP_ECOMMERCE_LIST_ID,
+  CLICKUP_MARKETING_LIST_ID,
+} from "./config.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, "..", "clickup-mcp", ".env") });
-
-const CLICKUP_API_TOKEN = process.env.CLICKUP_API_TOKEN;
-const ECOMMERCE_LIST_ID = process.env.CLICKUP_ECOMMERCE_LIST_ID;
-const MARKETING_LIST_ID = process.env.CLICKUP_MARKETING_LIST_ID;
+const ECOMMERCE_LIST_ID = CLICKUP_ECOMMERCE_LIST_ID;
+const MARKETING_LIST_ID = CLICKUP_MARKETING_LIST_ID;
 
 const CLICKUP_BASE_URL = "https://api.clickup.com/api/v2";
 const TIMEZONE = "America/Monterrey";
@@ -82,7 +83,7 @@ function buildSummaryMessage(ecommerceTasks, marketingTasks, motivationalPhrase)
   const lines = [];
   lines.push(`📋 *Resumen de Tareas — ${dayNameFixed}, ${now.day} de ${monthName}*`);
   lines.push("");
-  lines.push("¡Buenos días Jaime! Aquí está tu plan de batalla para hoy:");
+  lines.push("¡Buenos días! Aquí está tu plan de batalla para hoy:");
   lines.push("");
 
   if (ecommerceTasks.length > 0) {
@@ -151,7 +152,7 @@ async function getMotivationalPhrase() {
     const phrase = response.choices[0]?.message?.content?.trim();
     return phrase || FALLBACK_PHRASES[Math.floor(Math.random() * FALLBACK_PHRASES.length)];
   } catch (err) {
-    console.error("[scheduler] Error getting motivational phrase:", err.message);
+    logger.error("scheduler", "Error getting motivational phrase", err.message);
     return FALLBACK_PHRASES[Math.floor(Math.random() * FALLBACK_PHRASES.length)];
   }
 }
@@ -160,7 +161,7 @@ async function getMotivationalPhrase() {
 
 async function sendDailySummary(bot) {
   try {
-    console.log("[scheduler] Generating daily task summary...");
+    logger.info("scheduler", "Generating daily task summary...");
 
     const myUserId = await getMyUserId();
 
@@ -185,19 +186,27 @@ async function sendDailySummary(bot) {
     const motivationalPhrase = await getMotivationalPhrase();
     const message = buildSummaryMessage(ecommerceTasks, marketingTasks, motivationalPhrase);
 
-    // Send to all allowed chat IDs
     for (const chatId of ALLOWED_CHAT_IDS) {
       try {
-        await bot.api.sendMessage(chatId, message, { parse_mode: "Markdown" });
-        console.log(`[scheduler] Summary sent to chat ${chatId}`);
+        const chat = await bot.api.getChat(chatId);
+        const name = chat.first_name || "equipo";
+        const personalizedMessage = message.replace("¡Buenos días!", `¡Buenos días ${name}!`);
+
+        await bot.api.sendMessage(chatId, personalizedMessage, { parse_mode: "Markdown" });
+        logger.info("scheduler", `Summary sent to chat ${chatId}`);
       } catch (err) {
         // Fallback: try without markdown if parsing fails
-        console.error(`[scheduler] Markdown failed for chat ${chatId}, retrying plain:`, err.message);
-        await bot.api.sendMessage(chatId, message.replace(/[*_]/g, "")).catch(() => {});
+        logger.error("scheduler", `Markdown failed for chat ${chatId}, retrying plain`, err.message);
+        
+        const chat = await bot.api.getChat(chatId).catch(() => ({}));
+        const name = chat.first_name || "equipo";
+        const personalizedMessage = message.replace("¡Buenos días!", `¡Buenos días ${name}!`);
+
+        await bot.api.sendMessage(chatId, personalizedMessage.replace(/[*_]/g, "")).catch(() => {});
       }
     }
   } catch (err) {
-    console.error("[scheduler] Error sending daily summary:", err);
+    logger.error("scheduler", "Error sending daily summary", err.message);
   }
 }
 
@@ -205,7 +214,7 @@ async function sendDailySummary(bot) {
 
 export function startScheduler(bot) {
   if (!CLICKUP_API_TOKEN) {
-    console.warn("[scheduler] Missing CLICKUP_API_TOKEN — daily summary disabled.");
+    logger.warn("scheduler", "Missing CLICKUP_API_TOKEN — daily summary disabled.");
     return;
   }
 
@@ -214,5 +223,5 @@ export function startScheduler(bot) {
     timezone: TIMEZONE,
   });
 
-  console.log("[scheduler] Daily summary scheduled: Mon–Fri at 9:00 AM (America/Monterrey)");
+  logger.info("scheduler", "Daily summary scheduled: Mon–Fri at 9:00 AM (America/Monterrey)");
 }

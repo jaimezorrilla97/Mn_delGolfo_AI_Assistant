@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { OAuth2Client } from "google-auth-library";
@@ -8,21 +7,22 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 
 const ROOT_DIR = path.dirname(new URL(import.meta.url).pathname);
-dotenv.config({ path: path.join(ROOT_DIR, ".env") });
 
-const PROPERTY_ID = process.env.PROPERTY_ID;
+const PROPERTY_ID = process.env.GA4_PROPERTY_ID || process.env.PROPERTY_ID;
 
 if (!PROPERTY_ID) {
-  throw new Error("Missing PROPERTY_ID in .env");
+  throw new Error("Missing GA4_PROPERTY_ID environment variable");
 }
 
-const credentials = JSON.parse(
-  fs.readFileSync(path.join(ROOT_DIR, "oauth-client.json"), "utf8")
-);
+// Support Base64-encoded credentials via env vars (for cloud deployment)
+// or fall back to reading local files
+const credentials = process.env.GA4_OAUTH_CLIENT_B64
+  ? JSON.parse(Buffer.from(process.env.GA4_OAUTH_CLIENT_B64, "base64").toString())
+  : JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "oauth-client.json"), "utf8"));
 
-const token = JSON.parse(
-  fs.readFileSync(path.join(ROOT_DIR, "token.json"), "utf8")
-);
+const token = process.env.GA4_TOKEN_B64
+  ? JSON.parse(Buffer.from(process.env.GA4_TOKEN_B64, "base64").toString())
+  : JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "token.json"), "utf8"));
 
 const clientInfo = credentials.installed || credentials.web;
 

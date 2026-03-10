@@ -3,6 +3,7 @@ import { TELEGRAM_BOT_TOKEN, ALLOWED_CHAT_IDS, GROQ_API_KEY } from "./config.js"
 import { handleUserMessage } from "./orchestrator.js";
 import { clearHistory } from "./session.js";
 import { transcribeVoice } from "./voice.js";
+import { logger } from "./logger.js";
 
 const TELEGRAM_MAX_LENGTH = 4096;
 
@@ -82,7 +83,7 @@ export function createBot(mcpManager) {
       // Process as a normal message
       await processUserMessage(ctx, transcription, mcpManager);
     } catch (err) {
-      console.error("[bot] Error handling voice:", err);
+      logger.error("bot", "Error handling voice", err.message);
       await ctx.reply("Something went wrong processing your voice note. Please try again.");
     }
   });
@@ -124,7 +125,7 @@ async function processUserMessage(ctx, userText, mcpManager) {
       }
     }
   } catch (err) {
-    console.error("[bot] Error handling message:", err);
+    logger.error("bot", "Error handling message", err.message);
     await ctx.reply("Something went wrong. Please try again.");
   }
 }

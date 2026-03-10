@@ -13,16 +13,21 @@ export const ALLOWED_CHAT_IDS = process.env.ALLOWED_CHAT_IDS
   ? process.env.ALLOWED_CHAT_IDS.split(",").map(Number)
   : [];
 
+// ClickUp config (used by scheduler)
+export const CLICKUP_API_TOKEN = process.env.CLICKUP_API_TOKEN;
+export const CLICKUP_ECOMMERCE_LIST_ID = process.env.CLICKUP_ECOMMERCE_LIST_ID;
+export const CLICKUP_MARKETING_LIST_ID = process.env.CLICKUP_MARKETING_LIST_ID;
+
 // MCP Server Registry — add new servers here
 export const MCP_SERVERS = [
   {
     name: "ga4",
-    command: "/usr/local/bin/node",
+    command: process.execPath,
     args: [path.join(__dirname, "..", "ga4-mcp", "server.js")],
   },
   {
     name: "clickup",
-    command: "/usr/local/bin/node",
+    command: process.execPath,
     args: [path.join(__dirname, "..", "clickup-mcp", "server.js")],
   },
 ];
