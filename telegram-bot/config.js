@@ -1,0 +1,28 @@
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
+
+export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+export const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "anthropic/claude-sonnet-4-20250514";
+export const GROQ_API_KEY = process.env.GROQ_API_KEY;
+export const ALLOWED_CHAT_IDS = process.env.ALLOWED_CHAT_IDS
+  ? process.env.ALLOWED_CHAT_IDS.split(",").map(Number)
+  : [];
+
+// MCP Server Registry — add new servers here
+export const MCP_SERVERS = [
+  {
+    name: "ga4",
+    command: "/usr/local/bin/node",
+    args: [path.join(__dirname, "..", "ga4-mcp", "server.js")],
+  },
+  {
+    name: "clickup",
+    command: "/usr/local/bin/node",
+    args: [path.join(__dirname, "..", "clickup-mcp", "server.js")],
+  },
+];

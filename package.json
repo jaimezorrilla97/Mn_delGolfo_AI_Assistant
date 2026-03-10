@@ -1,0 +1,26 @@
+{
+  "name": "ga4-claude-connector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bot": "node telegram-bot/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@google-analytics/data": "^5.2.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "google-auth-library": "^10.6.1",
+    "grammy": "^1.41.1",
+    "luxon": "^3.7.2",
+    "node-cron": "^4.2.1",
+    "open": "^11.0.0",
+    "openai": "^6.27.0"
+  }
+}

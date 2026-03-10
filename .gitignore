@@ -1,0 +1,17 @@
+node_modules/
+
+# Environment files (all directories)
+**/.env
+
+# Google OAuth credentials
+**/oauth-client.json
+**/token.json
+
+# SQLite data
+data/
+
+# OS files
+.DS_Store
+
+# Claude Code local settings
+.claude/settings.local.json
