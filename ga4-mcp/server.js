@@ -11,7 +11,8 @@ const ROOT_DIR = path.dirname(new URL(import.meta.url).pathname);
 const PROPERTY_ID = process.env.GA4_PROPERTY_ID || process.env.PROPERTY_ID;
 
 if (!PROPERTY_ID) {
-  throw new Error("Missing GA4_PROPERTY_ID environment variable");
+  const envKeys = Object.keys(process.env).filter(k => k.includes("GA4") || k.includes("PROP"));
+  throw new Error(`Missing GA4_PROPERTY_ID environment variable. Found instead: ${envKeys.join(", ")}`);
 }
 
 // Support Base64-encoded credentials via env vars (for cloud deployment)
