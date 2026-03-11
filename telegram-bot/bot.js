@@ -16,7 +16,9 @@ export function createBot(mcpManager) {
       ALLOWED_CHAT_IDS.length > 0 &&
       !ALLOWED_CHAT_IDS.includes(ctx.chat?.id)
     ) {
-      return ctx.reply("Unauthorized.");
+      return ctx.reply(
+        `Unauthorized.\nYour chat ID is: ${ctx.chat.id}\nSend this ID to Jaime so he can authorize you.`
+      );
     }
     await next();
   });
@@ -99,7 +101,7 @@ async function processUserMessage(ctx, userText, mcpManager) {
     await ctx.replyWithChatAction("typing");
 
     const typingInterval = setInterval(() => {
-      ctx.replyWithChatAction("typing").catch(() => {});
+      ctx.replyWithChatAction("typing").catch(() => { });
     }, 4000);
 
     let reply;
@@ -121,7 +123,7 @@ async function processUserMessage(ctx, userText, mcpManager) {
     } else {
       const chunks = splitMessage(reply, TELEGRAM_MAX_LENGTH);
       for (const chunk of chunks) {
-        await ctx.reply(chunk).catch(() => {});
+        await ctx.reply(chunk).catch(() => { });
       }
     }
   } catch (err) {
